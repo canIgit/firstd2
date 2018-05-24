@@ -1,24 +1,22 @@
-var net = require('net');
 var arg = process.argv[2];
-console.log(arg);
+var http = require('http');
+var fs = require('fs');
+http.createServer(function(req, res) {
+  res.writeHead(200, { 'content-type': 'text/plain' })
+  var filename = process.argv[3];
 
-function zeroFill(i) {
-  return (i < 10 ? '0' : '') + i;
-}
+  // This line opens the file as a readable stream
+  var readStream = fs.createReadStream(filename);
 
-function now () {
-  var d = new Date();
-  return d.getFullYear() + '-'
-    + zeroFill(d.getMonth() + 1) + '-'
-    + zeroFill(d.getDate()) + ' '
-    + zeroFill(d.getHours()) + ':'
-    + zeroFill(d.getMinutes());
-}
+  // This will wait until we know the readable stream is actually valid before piping
+  readStream.on('open', function () {
+    // This just pipes the read stream to the response object
+    readStream.pipe(res);
+  });
 
+  // This catches any errors that happen while creating the readable stream
+  readStream.on('error', function(err) {
+    res.end(err);
+  });
+}).listen(Number(arg));
 
-var server = net.createServer((socket)=>{
-    // console.log(socket);
-    // var d = new Date();
-    socket.end(now() + '\n');
-});
-server.listen(Number(arg));
