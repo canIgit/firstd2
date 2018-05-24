@@ -1,64 +1,31 @@
- var pathdir = process.argv[2];
- 
-//  console.log(pathdir);
- var http = require("http");
- var BufferList = require("bl");
-  http.get(pathdir, (res)=>{
-        res.pipe(BufferList(function (err, content) {
-            if (err) {
-              return console.error(err)
-            }
-            content = content.toString()
-            console.log(content.length)
-            console.log(content);
+ var http = require('http')
+    var BufferList = require('bl')
+    var results = []
+    var count = 0
+    
+    function printResults () {
+      for (var i = 0; i < 3; i++) {
+        console.log(results[i])
+      }
+    }
+    
+    function httpGet (index) {
+      http.get(process.argv[2 + index], function (response) {
+        response.pipe(BufferList(function (err, data) {
+          if (err) {
+            return console.error(err)
+          }
+    
+          results[index] = data.toString()
+          count++
+    
+          if (count === 3) {
+            printResults()
+          }
         }))
-  })
- 
-//  http.get(pathdir, (res)=>{
-//      const {statusCode} = res;
-//      const contentType = res.headers['content-type'];
-//     //  console.log('content-type: '+contentType);
-//     //  console.log(res);
+      })
+    }
     
-    
-//     let error;
-    
-//     if(statusCode != 200){
-//         error = new Error('Request failed: /n'+ `Status code: ${statusCode}`);
-//     }
-//     // else if(!/^application\/json/.test(contentType)){
-//     //     error = new Error('Invalid content type: '+ `expected application/json but received ${contentType}`);
-//     // }
-    
-//     if(error){
-//         console.error(error.message);
-//         res.resume();
-//         return;
-//     }
-    
-//     res.setEncoding('utf8');
-    
-//     let responseData = '';
-//     let bl = new BufferList();
-//     res.on('data', (chunk)=>{
-//         bl.append(new Buffer(chunk))
-//         responseData += chunk;
-//         //  console.log(chunk);
-      
-//     })
-    
-//     // res.pipe(BufferList(function(err, data)=>{
-//     //     console.log(data);
-//     // }))
-    
-//     res.on('end', ()=>{
-//         console.log(bl.length);
-//          console.log(responseData);
-//     })
-    
-//     res.on('error', console.error);
-    
-//  }).on('error', (e)=>{
-//      console.error(`Got error: ${e.message}`);
-//  })
- 
+    for (var i = 0; i < 3; i++) {
+      httpGet(i)
+    }
