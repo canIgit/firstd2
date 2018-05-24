@@ -1,31 +1,24 @@
- var http = require('http')
-    var BufferList = require('bl')
-    var results = []
-    var count = 0
-    
-    function printResults () {
-      for (var i = 0; i < 3; i++) {
-        console.log(results[i])
-      }
-    }
-    
-    function httpGet (index) {
-      http.get(process.argv[2 + index], function (response) {
-        response.pipe(BufferList(function (err, data) {
-          if (err) {
-            return console.error(err)
-          }
-    
-          results[index] = data.toString()
-          count++
-    
-          if (count === 3) {
-            printResults()
-          }
-        }))
-      })
-    }
-    
-    for (var i = 0; i < 3; i++) {
-      httpGet(i)
-    }
+var net = require('net');
+var arg = process.argv[2];
+console.log(arg);
+
+function zeroFill(i) {
+  return (i < 10 ? '0' : '') + i;
+}
+
+function now () {
+  var d = new Date();
+  return d.getFullYear() + '-'
+    + zeroFill(d.getMonth() + 1) + '-'
+    + zeroFill(d.getDate()) + ' '
+    + zeroFill(d.getHours()) + ':'
+    + zeroFill(d.getMinutes());
+}
+
+
+var server = net.createServer((socket)=>{
+    // console.log(socket);
+    // var d = new Date();
+    socket.end(now() + '\n');
+});
+server.listen(Number(arg));
